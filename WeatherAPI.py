@@ -2,6 +2,8 @@ import argparse
 import json
 import urllib2
 import requests
+import time
+import datetime
 
 parser = argparse.ArgumentParser()  # Start args.
 parser.add_argument("-tgt", "--target", help="Zip code of weather data to be retrieved.")
@@ -26,25 +28,38 @@ else:
     print "ERROR: API-Key missing.\nExiting..."
     quit(1)
 # End handling args
+api_data = {}
+
 
 def request(apikey, targets, sDate, eDate):
-    dict = {"appKey":"b1658f18-9f42-4dad-9178-a1adbc2c5d86", "targets":"93551", "startDate":"2010-1-01", "endDate":"2010-1-02"}
+    parameters = {"appKey": "b1658f18-9f42-4dad-9178-a1adbc2c5d86", "targets": "93551", "startDate": "2010-1-01", "endDate": "2010-1-02"}
     if apikey != '':
-        dict["appKey"] = apikey
+        parameters["appKey"] = apikey
     if targets != '':
-        dict["targets"] = targets
+        parameters["targets"] = targets
     if sDate != '':
-        dict["startDate"] = sDate
+        parameters["startDate"] = sDate
     if eDate != '':
-        dict["endDate"] = eDate
+        parameters["endDate"] = eDate
     parameters = ""
-    for key in dict:
-        parameters =  parameters + key + "=" + dict[key] + '&'
-    url = 'http://et.water.ca.gov/api/data?' + parameters + 'dataItems=day-asce-eto,day-eto,day-precip&unitOfMeasure=M;prioritizeSCS=N'
+    for key in parameters:
+        parameters = parameters + key + "=" + parameters[key] + '&'
+    url = 'http://et.water.ca.gov/api/data?' + parameters + 'dataItems=day-asce-eto,day-eto,day-precip&unitOfMeasure=E;prioritizeSCS=N'
     response = requests.get(url)
 
-    if (response.ok):
+    if response.ok:
         jData = json.loads(response.content)
-        print (jData)
+        global api_data
+        api_data = jData
     else:
         response.raise_for_status()
+
+
+def timestamp():
+    ts = time.time()
+    return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+
+
+def handle_data(data):
+    pass
+    # TODO: Handle data, make relevant, etc.
