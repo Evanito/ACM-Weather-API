@@ -1,7 +1,6 @@
 import argparse
 import json
 import urllib2
-import requests
 import time
 import datetime
 
@@ -26,38 +25,38 @@ if args.apikey:
     api_key = str(args.api_key)
 else:
     print "ERROR: API-Key missing.\nExiting..."
-    quit(1)
+    # quit(1)
 # End handling args
 api_data = {}
 
 
 def request(apikey, targets, sDate, eDate):
-    parameters = {"appKey": "b1658f18-9f42-4dad-9178-a1adbc2c5d86", "targets": "93551", "startDate": "2010-1-01", "endDate": "2010-1-02"}
+    arguments = {"appKey": "b1658f18-9f42-4dad-9178-a1adbc2c5d86", "targets": "93551", "startDate": "2010-1-01", "endDate": "2010-1-02"}
     if apikey != '':
-        parameters["appKey"] = apikey
+        arguments["appKey"] = str(apikey)
     if targets != '':
-        parameters["targets"] = targets
+        arguments["targets"] = str(targets)
     if sDate != '':
-        parameters["startDate"] = sDate
+        arguments["startDate"] = str(sDate)
     if eDate != '':
-        parameters["endDate"] = eDate
+        arguments["endDate"] = str(eDate)
     parameters = ""
-    for key in parameters:
-        parameters = parameters + key + "=" + parameters[key] + '&'
-    url = 'http://et.water.ca.gov/api/data?' + parameters + 'dataItems=day-asce-eto,day-eto,day-precip&unitOfMeasure=E;prioritizeSCS=N'
-    response = requests.get(url)
-
-    if response.ok:
-        jData = json.loads(response.content)
-        global api_data
-        api_data = jData
-    else:
-        response.raise_for_status()
+    for key in arguments:
+        parameters = str(parameters) + str(key) + "=" + str(arguments[key]) + '&'
+    url = 'http://et.water.ca.gov/api/data?' + parameters + 'dataItems=day-asce-eto,day-eto,day-precip&unitOfMeasure=M;prioritizeSCS=N'
+    api_response = urllib2.urlopen(url)
+    response = json.loads(api_response.read())
+    api_response.close()
+    global api_data
+    api_data = response
 
 
 def timestamp():
     ts = time.time()
     return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+
+
+request("b1658f18-9f42-4dad-9178-a1adbc2c5d86",'93551',timestamp(),timestamp())
 
 
 def handle_data(data):
