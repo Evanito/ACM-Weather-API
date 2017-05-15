@@ -21,7 +21,7 @@ else:
     target = location_zip
     print "Autodetected Zip: " + target 
 if args.apikey:
-    api_key = str(args.api_key)
+    api_key = str(args.apikey)
 else:
     print "WARN: API-Key missing.\nUsing default."
     api_key = "b1658f18-9f42-4dad-9178-a1adbc2c5d86"
